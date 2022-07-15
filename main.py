@@ -123,14 +123,16 @@ class WordleHelper:
     def enterGuess(self, word: str, signs: list):
         dupes_multi_max = []
         for _ in range(5):
-            dupes_multi_max.append([0, 1, 0])
+            dupes_multi_max.append([0, 1, 1])
         for i in range(len(word)):
             for j in range(len(word)):
                 if i == j:
                     continue
                 elif word[i] == word[j]:
                     dupes_multi_max[i][0] += 1
-                    dupes_multi_max[i][2] = dupes_multi_max[i][0]
+                    dupes_multi_max[i][2] += 1
+
+        print(dupes_multi_max)
 
         for i in range(len(word)):
             for j in range(len(word)):
@@ -143,21 +145,23 @@ class WordleHelper:
                     # if i index is yellow or green and j gray
                     elif ((signs[i] == 1 or signs[i] == 2) and signs[j] == 0):
                         signs[j] = 3
-                        if signs[i] == 2 and dupes_multi_max[i][2] > 1:
+                        if (signs[i] == 2 and dupes_multi_max[i][2] > 0) and dupes_multi_max[j][2] != 0:
                             dupes_multi_max[i][2] -= 1
+                            dupes_multi_max[j][2] = 0
                     # if j index is yellow or green and i gray
                     elif (signs[i] == 0 and (signs[j] == 1 or signs[j] == 2)):
                         signs[i] = 3
-                        if signs[j] == 2 and dupes_multi_max[i][2] > 1:
+                        if (signs[j] == 2 and dupes_multi_max[i][2] > 0) and dupes_multi_max[i][2] != 0:
                             dupes_multi_max[j][2] -= 1
+                            dupes_multi_max[i][2] = 0
+
+        print(signs)
+        print(dupes_multi_max)
 
         for i in range(len(word)):
             prime_letter = self.prime_alpha_dict[word[i]]
             prime_index_letter = self.prime_alpha_dict[word[i]+f"{i+1}"]
             new_word_list = []
-
-            #print(signs)
-            #print(dupes_multi_max)
 
             if signs[i] == 2:  # Green
                 for j in range(len(self.prime_words)):
@@ -168,7 +172,7 @@ class WordleHelper:
                             prime_letter**dupes_multi_max[i][1]) == 0)
 
                     cond2 = True
-                    if dupes_multi_max[i][2] > 0:
+                    if dupes_multi_max[i][2] > 0 and dupes_multi_max[i][0] > 0:
                         cond2 = True
                         for k in range(dupes_multi_max[i][2]+1, len(word)):
                             if cond2:
@@ -188,7 +192,7 @@ class WordleHelper:
                             prime_letter**dupes_multi_max[i][1]) == 0)
 
                     cond2 = True
-                    if dupes_multi_max[i][2] > 0:
+                    if dupes_multi_max[i][2] > 0 and dupes_multi_max[i][0] > 0:
                         cond2 = True
                         for k in range(dupes_multi_max[i][2]+1, len(word)):
                             if cond2:
@@ -238,8 +242,8 @@ wordleHelper = WordleHelper(wordle_allowed)
 
 # print(wordleHelper.findNextBestWord(removeDupes=True))
 
-wordleHelper.enterGuess("", [0, 0, 1, 2, 0])
+wordleHelper.enterGuess("slate", [2, 0, 0, 0, 1])
 
-#wordleHelper.enterGuess("", [2, 0, 2, 2, 0])
+wordleHelper.enterGuess("seres", [2, 2, 1, 2, 0])
 
-#wordleHelper.enterGuess("", [2, 2, 2, 2, 0])
+#wordleHelper.enterGuess("poled", [0, 0, 1, 1, 2])
